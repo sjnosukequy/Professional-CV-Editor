@@ -1,0 +1,8 @@
+a {
+    color: red !important;
+    text-decoration: underline !important;
+}
+
+* {
+    font-family: "Noto Sans", sans-serif;
+}

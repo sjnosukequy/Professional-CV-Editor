@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <link rel="stylesheet" href="./style/daisy.css">
+  <script src="./script/tailwinds.js"></script>
+  <link rel="stylesheet" href="./style/style.css">
+  <link rel="stylesheet" href="./style/theme.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.1/jspdf.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+</head>
+
+<body class="bg-base-100 p-8" data-theme="light">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 overflow-hidden">
+    <!-- Input Form -->
+    <!-- name of each tab group should be unique -->
+    <div class="h-[calc(100vh-64px)] flex flex-col bg-base-200 p-6 rounded-lg shadow-md">
+      <div class="tabs tabs-box mb-3">
+        <input type="radio" name="my_tabs" class="tab" aria-label="CV Editor" checked="checked" />
+        <input type="radio" name="my_tabs" class="tab" aria-label="AI" />
+      </div>
+
+      <div id="cv-editor" class="flex-1 overflow-auto px-5">
+        <h2 class="text-2xl font-bold mb-6">CV Information</h2>
+
+        <!-- Personal Information -->
+        <section class="mb-8">
+          <h3 class="text-xl font-semibold mb-4">Personal Information</h3>
+          <div class="space-y-4">
+            <input type="text" id="name" placeholder="Full Name" class="w-full p-2 border rounded" />
+            <input type="email" id="email" placeholder="Email" class="w-full p-2 border rounded" />
+            <input type="text" id="location" placeholder="Location" class="w-full p-2 border rounded" />
+            <input type="text" id="linkedin" placeholder="LinkedIn URL" class="w-full p-2 border rounded" />
+            <input type="text" id="github" placeholder="GitHub URL (optional)" class="w-full p-2 border rounded" />
+            <input type="text" id="website" placeholder="Personal Website (optional)"
+              class="w-full p-2 border rounded" />
+          </div>
+        </section>
+
+        <!-- Summary -->
+        <section class="mb-8">
+          <h3 class="text-xl font-semibold mb-4">Professional Summary</h3>
+          <textarea id="summary" placeholder="Tailored summary (2-3 sentences)" class="w-full p-2 border rounded h-32"
+            oninput="limitCharacters(this)"></textarea>
+        </section>
+
+        <!-- Skills -->
+        <section class="mb-8">
+          <h3 class="text-xl font-semibold mb-4">Skills</h3>
+          <div id="skills-fields">
+            <div class="skills-entry space-y-4">
+              <input type="text" placeholder="Skill Name" class="w-full p-2 border rounded" />
+              <input type="text" placeholder="Description" class="w-full p-2 border rounded" />
+              <button onclick="deleteBlock(this, 'skills-fields')"
+                class="btn btn-error text-white px-2 py-1 rounded mt-2">
+                Delete
+              </button>
+            </div>
+          </div>
+          <button onclick="addSkill()" class="mt-4 btn btn-info text-white px-4 py-2 rounded">Add Skills</button>
+        </section>
+
+        <!-- Experience -->
+        <section class="mb-8">
+          <h3 class="text-xl font-semibold mb-4">Experience</h3>
+          <div id="experience-fields" class="space-y-4">
+            <div class="experience-entry">
+              <input type="text" placeholder="Position" class="w-full p-2 border rounded" />
+              <input type="text" placeholder="Company" class="w-full p-2 border rounded mt-2" />
+              <input type="text" placeholder="Location" class="w-full p-2 border rounded mt-2" />
+              <input type="text" placeholder="Dates" class="w-full p-2 border rounded mt-2" />
+              <textarea placeholder="Bullet points (one per line)"
+                class="w-full p-2 border rounded mt-2 h-24"></textarea>
+              <button onclick="deleteBlock(this, 'experience-fields')"
+                class="btn-error text-white px-2 py-1 rounded mt-2 btn">
+                Delete
+              </button>
+            </div>
+          </div>
+          <button onclick="addExperience()" class="mt-4 btn-info btn text-white px-4 py-2 rounded">Add
+            Experience</button>
+        </section>
+
+        <!-- Projects -->
+        <section class="mb-8">
+          <h3 class="text-xl font-semibold mb-4">Projects</h3>
+          <div id="project-fields" class="space-y-4">
+            <div class="project-entry">
+              <input type="text" placeholder="Project Name" class="w-full p-2 border rounded" />
+              <input type="text" placeholder="Link" class="w-full p-2 border rounded mt-2" />
+              <textarea placeholder="Bullet points (one per line)"
+                class="w-full p-2 border rounded mt-2 h-24"></textarea>
+              <button onclick="deleteBlock(this, 'project-fields')"
+                class="btn btn-error text-white px-2 py-1 rounded mt-2">
+                Delete
+              </button>
+            </div>
+          </div>
+          <button onclick="addProject()" class="mt-4 btn btn-info text-white px-4 py-2 rounded">Add Project</button>
+        </section>
+
+        <!-- Education -->
+        <section class="mb-8">
+          <h3 class="text-xl font-semibold mb-4">Education</h3>
+          <div id="education-fields">
+            <div class="education-entry space-y-4">
+              <input type="text" placeholder="University" class="w-full p-2 border rounded" />
+              <input type="text" placeholder="Degree" class="w-full p-2 border rounded" />
+              <input type="text" placeholder="GPA (optional)" class="w-full p-2 border rounded" />
+              <input type="text" placeholder="Graduation Date" class="w-full p-2 border rounded" />
+              <button onclick="deleteBlock(this, 'education-fields')"
+                class="btn btn-error text-white px-2 py-1 rounded mt-2">
+                Delete
+              </button>
+            </div>
+          </div>
+          <button onclick="addEducation()" class="mt-4 btn btn-info text-white px-4 py-2 rounded">Add Education</button>
+        </section>
+
+      </div>
+
+      <div id="ai-editor" class="flex-1 overflow-auto px-5 hidden">
+        <h2 class="text-2xl font-bold mb-6">AI Editor</h2>
+        <h3 class="text-xl font-semibold mb-2">Job Description</h3>
+        <textarea id="JD" placeholder="Job Description" class="w-full p-3 border rounded mb-2 h-24"></textarea>
+        <h3 class="text-xl font-semibold mb-2">Yourself</h3>
+        <textarea id="yourself" placeholder="Describe Yourself" class="w-full p-3 border rounded mb-2 h-24"></textarea>
+        <div class="flex flex-row gap-5">
+          <select id="language" class="select">
+            <option selected>English</option>
+            <option>Vietnamese</option>
+            <!-- <option>Japanese</option>
+            <option>Korean</option> -->
+            <option>Spanish</option>
+            <option>French</option>
+          </select>
+          <div class="relative">
+            <div id="AiLoader" class="loader hidden absolute inset-0 z-50 backdrop-blur-sm bg-black/10 items-center justify-center">
+              <span class="loading loading-spinner loading-lg text-blue-500"></span>
+            </div>
+            <button class="btn bg-blue-50 text-blue-500" onclick="generateAI()">AI Generation</button>
+          </div>
+        </div>
+        <p id="AI-error" class="text-red-500"></p>
+      </div>
+
+    </div>
+
+    <!-- CV Preview -->
+    <div class="bg-base-200 p-6 rounded-lg shadow-md overflow-auto flex flex-col h-[calc(100vh-64px)] gap-5">
+      <div id="cv-preview" class="display-none">
+        <!-- Preview content will be generated here -->
+      </div>
+      <object class="w-full h-full m-0 p-0 flex-1" id="pdf-embed" type="application/pdf"></object>
+      <div class="flex flex-row gap-5 flex-wrap">
+        <button class="btn bg-emerald-50 text-emerald-500" onclick="AutoUpdate()">Update</button>
+        <button class="btn bg-blue-50 text-blue-500" onclick="downloadPDF()">Download File</button>
+        <button class="btn bg-orange-50 text-orange-500" onclick="downloadJson()">Save File</button>
+        <fieldset class="">
+          <div class="flex flex-row gap-1">
+            <label class="fieldset-label btn bg-yellow-50 text-yellow-500 relative">
+              Load File
+              <input type="file" class="file-input file-input-warning opacity-0 absolute inset-0" id="input"
+                accept=".json" />
+            </label>
+            <label class="fieldset-label err text-error"></label>
+          </div>
+        </fieldset>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="./script/EBGaramond-Bold-normal.js"></script>
+  <script src="./script/EBGaramond-Regular-normal.js"></script>
+  <script src="./script/main.js"></script>
+</body>
+
+</html>

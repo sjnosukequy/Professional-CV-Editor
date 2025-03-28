@@ -1,0 +1,63 @@
+{
+    "name": "Alex Nguyen",
+    "email": "alex.nguyen@example.com",
+    "location": "Ho Chi Minh City, Vietnam",
+    "linkedin": "linkedin.com/in/alexnguyen",
+    "github": "",
+    "website": "alexnguyenportfolio.com",
+    "summary": "Creative Director with 5 years of experience in graphic design, game art, and animation. Expert in leading cross-functional teams and delivering high-quality visual assets while adhering to tight deadlines. Skilled in Photoshop, Illustrator, Maya, and Blender, with strong aesthetic judgment in color, lighting, and composition.",
+    "experiences": [
+        {
+            "position": "Art Director",
+            "company": "Pixel Studio",
+            "location": "Ho Chi Minh City, Vietnam",
+            "dates": "Jan 2020 - Present",
+            "bullets": ""
+        },
+        {
+            "position": "Senior Graphic Designer",
+            "company": "Creative Sparks Agency",
+            "location": "Ho Chi Minh City, Vietnam",
+            "dates": "Jan 2017 - Dec 2019",
+            "bullets": "Designed and developed branding materials, digital assets, and animations for clients.\nLed team brainstorming sessions to generate innovative visual concepts.\nOptimized graphic deliverables using advanced techniques in Photoshop and Illustrator.\nWorked closely with marketing teams to ensure design alignment with campaign goals."
+        }
+    ],
+    "educations": [
+        {
+            "university": "University of Fine Arts",
+            "degree": "Bachelor of Arts in Graphic Design",
+            "gpa": "3.8",
+            "graduationDate": "June 2016"
+        }
+    ],
+    "projects": [
+        {
+            "name": "Fantasy World 3D Game Art",
+            "link": "github.com/alexnguyen/fantasy-world",
+            "bullets": "Created all 3D character and environmental assets using Blender and Maya.\nImplemented lighting and shading techniques for realistic game aesthetics."
+        },
+        {
+            "name": "Creative Branding for Startup X",
+            "link": "alexnguyenportfolio.com/branding-startupx",
+            "bullets": "Designed complete branding package, including logo, marketing collateral, and web visuals.\nCollaborated directly with client to capture vision and achieve branding goals."
+        }
+    ],
+    "skills": [
+        {
+            "name": "Graphic Design",
+            "description": "Expert in visual design, brand identity, and UI/UX design."
+        },
+        {
+            "name": "2D and 3D Art",
+            "description": "Proficient in Photoshop, Illustrator, Maya, and Blender for asset creation."
+        },
+        {
+            "name": "Creative Leadership",
+            "description": "Strong ability to mentor teams and direct art production."
+        },
+        {
+            "name": "Project Management",
+            "description": "Experienced in setting milestones, managing timelines, and ensuring delivery quality."
+        }
+    ]
+}
