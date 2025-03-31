@@ -113,6 +113,11 @@ function PersonalInfo() {
     data.push(document.getElementById('email').value);
   if (document.getElementById('linkedin').value)
     data.push(document.getElementById('linkedin').value);
+  return data.join(' • ');
+}
+
+function PersonalInfo2() {
+  const data = [];
   if (document.getElementById('github').value)
     data.push(document.getElementById('github').value);
   if (document.getElementById('website').value)
@@ -240,13 +245,14 @@ function getObject() {
   const github = document.getElementById('github')?.value;
   const website = document.getElementById('website')?.value;
   const summary = document.getElementById('summary')?.value;
-  const experiences = Array.from(document.querySelectorAll('.experience-entry')).map(entry => {
+  const experiences = Array.from(document.querySelectorAll('.experience-entry')).map((entry, index) => {
     const fields = entry.querySelectorAll('input, textarea');
     const position = fields[0].value;
     const company = fields[1].value;
     const location = fields[2].value;
     const dates = fields[3].value;
     const bullets = fields[4].value;
+    console.log(index, fields);
     return { position, company, location, dates, bullets };
   });
   const projects = Array.from(document.querySelectorAll('.project-entry')).map(entry => {
@@ -271,7 +277,7 @@ function getObject() {
     return { university, degree, gpa, graduationDate };
   });
   const obj = { name, email, location, linkedin, github, website, summary, experiences, projects, skills, educations }
-  console.log(obj)
+  console.log('get object', obj)
   return obj
 }
 
@@ -284,7 +290,7 @@ function downloadJson() {
   a.style.display = 'none';
   a.href = url;
   // the filename you want
-  a.download = `${saveName}.json`;
+  a.download = `${saveName ? saveName : 'resume'}.json`;
   document.body.appendChild(a);
   a.click();
   window.URL.revokeObjectURL(url);
@@ -305,12 +311,25 @@ function generatePDF(obj, save = false) {
   const lineHeight = 16;
   var midPage = doc.internal.pageSize.getWidth() / 2
   let marginRight = doc.internal.pageSize.getWidth() - 40;
+  let marginBottom = doc.internal.pageSize.getHeight() - 40;
+  let marginTop = 40
   // const obj = getObject()
 
-  doc.addFileToVFS('EBGaramond-Regular-normal.ttf', font);
-  doc.addFileToVFS('EBGaramond-Regular-bold.ttf', fontBold);
-  doc.addFont("EBGaramond-Regular-normal.ttf", "EBGaramond", "normal");
-  doc.addFont("EBGaramond-Regular-bold.ttf", "EBGaramond", "bold");
+  const language = document.getElementById('language').value;
+  if (language == 'Japanese') {
+    doc.addFileToVFS('NotoSans-normal.ttf', RegJap);
+    doc.addFileToVFS('NotoSans-bold.ttf', Boldjap);
+  }
+  else if (language == 'Korean') {
+    doc.addFileToVFS('NotoSans-normal.ttf', KrRegular);
+    doc.addFileToVFS('NotoSans-bold.ttf', KrBold);
+  }
+  else {
+    doc.addFileToVFS('NotoSans-normal.ttf', font);
+    doc.addFileToVFS('NotoSans-bold.ttf', fontBold);
+  }
+  doc.addFont("NotoSans-normal.ttf", "NotoSans", "normal");
+  doc.addFont("NotoSans-bold.ttf", "NotoSans", "bold");
 
   const fonts = doc.getFontList();
   console.log(fonts);
@@ -322,17 +341,26 @@ function generatePDF(obj, save = false) {
     return lines.length;
   }
 
+  function checkAndAddPage() {
+    if (y > marginBottom) {
+      console.log('adding page')
+      doc.addPage('a4', 'p');
+      y = marginTop
+    }
+  }
+
   // Personal Information
-  doc.setFont('EBGaramond', 'bold');
+  doc.setFont('NotoSans', 'bold');
   doc.setFontSize(16);
   // const name = document.getElementById('name').value;
   const name = obj.name
   doc.text(name || "Your Name", midPage, y, { align: 'center' });
   y += lineHeight + padding;
 
-  doc.setFont('EBGaramond', 'normal');
+  doc.setFont('NotoSans', 'normal');
   doc.setFontSize(10);
   const personalInfo = PersonalInfo();
+  const personalInfo2 = PersonalInfo2();
   if (personalInfo) {
     const fullLength = doc.getStringUnitWidth(personalInfo) * 10;
     // let location = document.getElementById('location').value
@@ -375,10 +403,21 @@ function generatePDF(obj, save = false) {
     else
       doc.text(content, midPage - (fullLength / 2 - tempLength), y, { align: 'right' });
 
+    console.log(fullLength - tempLength, fullLength, tempLength)
+
+    y += lineHeight + padding;
+  }
+
+  if (personalInfo2) {
+    const fullLength = doc.getStringUnitWidth(personalInfo2) * 10;
+
+    let github = obj.github
+    let website = obj.website
+
     // github
-    content = temp && github ? ` • ${github}` : github ? `${github}` : '';
-    temp += temp && github ? ` • ${github}` : github ? `${github}` : '';
-    tempLength = doc.getStringUnitWidth(temp) * 10;
+    let content = github ? `${github}` : '';
+    let temp = github ? `${github}` : '';
+    let tempLength = doc.getStringUnitWidth(temp) * 10;
     if (content.includes('https://') || content.includes('www.')) {
       doc.setTextColor('#115bca')
       doc.setDrawColor('#115bca')
@@ -407,8 +446,6 @@ function generatePDF(obj, save = false) {
     else
       doc.text(content, midPage - (fullLength / 2 - tempLength), y, { align: 'right' });
 
-    console.log(fullLength - tempLength, fullLength, tempLength)
-
     y += lineHeight + padding;
   }
 
@@ -416,21 +453,24 @@ function generatePDF(obj, save = false) {
   // const summary = document.getElementById('summary').value;
   const summary = obj.summary;
   if (summary.trim()) {
-    doc.setFont('EBGaramond', 'bold');
+    doc.setFont('NotoSans', 'bold');
     doc.setFontSize(14);
     doc.text("Summary", marginLeft, y);
     doc.line(marginLeft, y + 5, marginRight, y + 5);
     y += lineHeight + padding;
+    checkAndAddPage()
 
-    doc.setFont('EBGaramond', 'normal');
+    doc.setFont('NotoSans', 'normal');
     doc.setFontSize(10);
-    const summaryLines = doc.splitTextToSize(summary, 540);
-    for (line of summaryLines) {
-      doc.text(line, marginLeft, y);
+    const summaryLines = doc.splitTextToSize(summary, 500);
+    for (line in summaryLines) {
+      doc.text(summaryLines[line], marginLeft, y);
       y += lineHeight;
+      if (line == summaryLines.length - 1)
+        y += 5
+      checkAndAddPage()
     }
     // console.log(summaryLines)
-    y += 5
   }
 
   // Skills Section
@@ -438,11 +478,12 @@ function generatePDF(obj, save = false) {
   if (skillsEntries.length) {
     const check = obj.skills
     if (check[0].skill || check[0].description) {
-      doc.setFont('EBGaramond', 'bold');
+      doc.setFont('NotoSans', 'bold');
       doc.setFontSize(14);
       doc.text("Skills", marginLeft, y);
       doc.line(marginLeft, y + 5, marginRight, y + 5);
       y += lineHeight + padding;
+      checkAndAddPage()
 
       skillsEntries.forEach((entry, index) => {
         // const fields = entry.querySelectorAll('input');
@@ -455,24 +496,37 @@ function generatePDF(obj, save = false) {
         temp += temp && description ? `, ${description.trim()}` : description ? `${description.trim()}` : '';
         let startX = marginLeft;
         temp.split('**').forEach((line, index) => {
-          doc.setFont('EBGaramond', 'bold');
+          doc.setFont('NotoSans', 'bold');
           if (index % 2 === 0) {
-            doc.setFont('EBGaramond', 'normal');
+            doc.setFont('NotoSans', 'normal');
           }
-          doc.text(line, startX, y);
-          startX = startX + doc.getStringUnitWidth(line) * 10;
+          const tempLines = doc.splitTextToSize(line.trim(), 500 - doc.getStringUnitWidth(skill.trim()) * 10);
+          // console.log(tempLines)
+          for (let bline in tempLines) {
+            doc.text(tempLines[bline], startX, y);
+            if (bline == 0 && tempLines.length == 1)
+              startX = startX + doc.getStringUnitWidth(tempLines[bline]) * 10;
+            else if (tempLines.length > 1 && bline != tempLines.length - 1) {
+              console.log('drop')
+              startX = marginLeft;
+              y += lineHeight
+              checkAndAddPage()
+            }
+          }
+          // doc.text(line, startX, y);
+          // startX = startX + doc.getStringUnitWidth(line) * 10;
         })
 
-        // doc.setFont('EBGaramond', 'bold');
+        // doc.setFont('NotoSans', 'bold');
         // doc.text(skill, marginLeft, y);
-        // doc.setFont('EBGaramond', 'normal');
+        // doc.setFont('NotoSans', 'normal');
         // doc.text(skill ? " : " + description : description, doc.getTextWidth(skill) + marginLeft, y);
 
         if (index != skillsEntries.length - 1)
           y += lineHeight
         else
           y += lineHeight + padding
-
+        checkAndAddPage()
       });
     }
   }
@@ -482,12 +536,13 @@ function generatePDF(obj, save = false) {
   if (experienceEntries.length) {
     const check = obj.experiences
     if (check[0].position || check[0].company || check[0].location || check[0].dates || check[0].bullets) {
-      doc.setFont('EBGaramond', 'bold');
+      doc.setFont('NotoSans', 'bold');
       doc.setFontSize(14);
       // y += lineHeight;
       doc.text("Experience", marginLeft, y);
       doc.line(marginLeft, y + 5, marginRight, y + 5);
       y += lineHeight + padding;
+      checkAndAddPage()
 
       experienceEntries.forEach((entry, index) => {
         const position = entry.position;
@@ -502,28 +557,38 @@ function generatePDF(obj, save = false) {
         temp += temp && location ? ` - **${location.trim()}**` : location ? `**${location.trim()}**` : '';
         let startX = marginLeft;
         temp.split('**').forEach((line, index) => {
-          doc.setFont('EBGaramond', 'bold');
+          doc.setFont('NotoSans', 'bold');
           if (index % 2 === 0) {
-            doc.setFont('EBGaramond', 'normal');
+            doc.setFont('NotoSans', 'normal');
           }
           doc.text(line, startX, y);
           startX = startX + doc.getStringUnitWidth(line) * 10;
         })
         doc.text(dates, doc.internal.pageSize.getWidth() - 40, y, { align: 'right' });
         y += lineHeight;
+        checkAndAddPage()
 
-        doc.setFont('EBGaramond', 'normal');
+        doc.setFont('NotoSans', 'normal');
         bullets.forEach((bullet, index) => {
           if (bullet.trim()) {
-            doc.text("•      " + bullet, marginLeft, y);
-            if (index != bullets.length - 1)
-              y += lineHeight;
+            const bulletLines = doc.splitTextToSize(bullet.trim(), 500);
+            for (line in bulletLines) {
+              if (line == 0)
+                doc.text("•      " + bulletLines[line], marginLeft, y);
+              else
+                doc.text("        " + bulletLines[line], marginLeft, y);
+              if (index != bullets.length - 1) {
+                y += lineHeight;
+                checkAndAddPage()
+              }
+            }
           }
         });
         if (index != experienceEntries.length - 1)
           y += lineHeight
         else
           y += padding
+        checkAndAddPage()
       })
     }
   }
@@ -533,12 +598,14 @@ function generatePDF(obj, save = false) {
   if (projectEntries.length) {
     const check = obj.projects
     if (check[0].projectName || check[0].projectLink || check[0].bullets) {
-      doc.setFont('EBGaramond', 'bold');
+      doc.setFont('NotoSans', 'bold');
       doc.setFontSize(14);
       y += lineHeight;
       doc.text("Projects", marginLeft, y);
       doc.line(marginLeft, y + 5, marginRight, y + 5);
       y += lineHeight + padding;
+      checkAndAddPage()
+
 
       projectEntries.forEach((entry, index) => {
         // const fields = entry.querySelectorAll('input, textarea');
@@ -548,10 +615,10 @@ function generatePDF(obj, save = false) {
         const projectName = entry.projectName;
         const projectLink = entry.projectLink;
         const bullets = entry.bullets.split('\n');
-        doc.setFont('EBGaramond', 'bold');
+        doc.setFont('NotoSans', 'bold');
         doc.setFontSize(10);
         doc.text(projectName, marginLeft, y);
-        doc.setFont('EBGaramond', 'normal');
+        doc.setFont('NotoSans', 'normal');
         if (projectLink.includes('https://') || projectLink.includes('www.')) {
           doc.setTextColor('#115bca')
           doc.setDrawColor('#115bca')
@@ -564,12 +631,22 @@ function generatePDF(obj, save = false) {
         else
           doc.text(projectLink, marginRight, y, { align: 'right' });
         y += lineHeight;
+        checkAndAddPage()
+
 
         bullets.forEach((bullet, index) => {
           if (bullet.trim()) {
-            doc.text("•      " + bullet, marginLeft, y);
-            if (index != bullets.length - 1)
-              y += lineHeight;
+            const bulletLines = doc.splitTextToSize(bullet.trim(), 500);
+            for (line in bulletLines) {
+              if (line == 0)
+                doc.text("•      " + bulletLines[line], marginLeft, y);
+              else
+                doc.text("        " + bulletLines[line], marginLeft, y);
+              if (index != bullets.length - 1) {
+                y += lineHeight;
+                checkAndAddPage()
+              }
+            }
           }
         });
 
@@ -577,7 +654,7 @@ function generatePDF(obj, save = false) {
           y += lineHeight
         else
           y += padding
-
+        checkAndAddPage()
       });
     }
   }
@@ -586,12 +663,13 @@ function generatePDF(obj, save = false) {
   const educationEntries = obj.educations
   if (educationEntries.length) {
     if (obj.educations[0].university || obj.educations[0].degree || obj.educations[0].gpa || obj.educations[0].graduationDate) {
-      doc.setFont('EBGaramond', 'bold');
+      doc.setFont('NotoSans', 'bold');
       doc.setFontSize(14);
       y += lineHeight;
       doc.text("Education", marginLeft, y);
       doc.line(marginLeft, y + 5, marginRight, y + 5);
       y += lineHeight + padding;
+      checkAndAddPage()
 
       educationEntries.forEach((entry, index) => {
         // const fields = entry.querySelectorAll('input');
@@ -611,21 +689,22 @@ function generatePDF(obj, save = false) {
         temp += temp && gpa ? ` - GPA: ${gpa.trim()}` : gpa ? `GPA: ${gpa.trim()}` : '';
         let startX = marginLeft;
         temp.split('**').forEach((line, index) => {
-          doc.setFont('EBGaramond', 'bold');
+          doc.setFont('NotoSans', 'bold');
           if (index % 2 === 0) {
-            doc.setFont('EBGaramond', 'normal');
+            doc.setFont('NotoSans', 'normal');
           }
           doc.text(line, startX, y);
           startX = startX + doc.getStringUnitWidth(line) * 10;
         })
 
-        doc.setFont('EBGaramond', 'normal');
+        doc.setFont('NotoSans', 'normal');
         doc.text(graduationDate, marginRight, y, { align: 'right' });
 
         if (index != educationEntries.length - 1)
           y += lineHeight
         else
           y += lineHeight + padding
+        checkAndAddPage()
       });
     }
   }
@@ -633,7 +712,7 @@ function generatePDF(obj, save = false) {
   document.querySelector('#pdf-embed').setAttribute('data', doc.output('bloburl'));
   if (save) {
     const saveName = prompt("Enter a name for your save file");
-    doc.save(`${saveName}.pdf`)
+    doc.save(`${saveName ? saveName : 'resume'}.pdf`)
   }
 
   // Open the PDF in a new window (selectable text)
@@ -694,7 +773,7 @@ function loadHtml(obj) {
           <input type="text" placeholder="Company" class="w-full p-2 border rounded mt-2" value="${exp.company}">
           <input type="text" placeholder="Location" class="w-full p-2 border rounded mt-2" value="${exp.location}">
           <input type="text" placeholder="Dates" class="w-full p-2 border rounded mt-2" value="${exp.dates}">
-          <textarea placeholder="Bullet points (one per line)" class="w-full p-2 border rounded mt-2 h-24" value="${exp.bullets}"></textarea>
+          <textarea placeholder="Bullet points (one per line)" class="w-full p-2 border rounded mt-2 h-24" value="${exp.bullets}">${exp.bullets}</textarea>
           <button onclick="deleteBlock(this, 'experience-fields')" class="btn btn-error text-white px-2 py-1 rounded mt-2">
             Delete
           </button>
@@ -717,7 +796,7 @@ function loadHtml(obj) {
       newEntry.innerHTML = `
       <input type="text" placeholder="Project Name" class="w-full p-2 border rounded" value="${proj.projectName}">
       <input type="text" placeholder="Link" class="w-full p-2 border rounded mt-2" value="${proj.projectLink}">
-      <textarea placeholder="Bullet points (one per line)" class="w-full p-2 border rounded mt-2 h-24" value="${proj.bullets}"></textarea>
+      <textarea placeholder="Bullet points (one per line)" class="w-full p-2 border rounded mt-2 h-24" value="${proj.bullets}">${proj.bullets}</textarea>
       <button onclick="deleteBlock(this, 'project-fields')" class="btn btn-error text-white px-2 py-1 rounded mt-2">
         Delete
       </button>
@@ -780,7 +859,7 @@ radios[1].addEventListener('change', () => {
   document.querySelector('#cv-editor').classList.add('hidden')
 })
 
-const prompt = `Instruction Prompt:
+const INSprompt = `Instruction Prompt:
 
 You are tasked to generate a CV in JSON format based on the following input:
 
@@ -928,7 +1007,7 @@ async function generateAI() {
         "messages": [
           {
             "role": "developer",
-            "content": prompt
+            "content": INSprompt
           },
           {
             "role": "user",

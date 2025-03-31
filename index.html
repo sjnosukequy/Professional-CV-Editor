@@ -21,9 +21,19 @@
     <!-- Input Form -->
     <!-- name of each tab group should be unique -->
     <div class="h-[calc(100vh-64px)] flex flex-col bg-base-200 p-6 rounded-lg shadow-md">
-      <div class="tabs tabs-box mb-3">
-        <input type="radio" name="my_tabs" class="tab" aria-label="CV Editor" checked="checked" />
-        <input type="radio" name="my_tabs" class="tab" aria-label="AI" />
+      <div class="flex flex-row gap-5">
+        <div class="tabs tabs-box mb-3">
+          <input type="radio" name="my_tabs" class="tab" aria-label="CV Editor" checked="checked" />
+          <input type="radio" name="my_tabs" class="tab" aria-label="AI" />
+        </div>
+        <select id="language" class="select mt-1">
+          <option selected>English</option>
+          <option>Vietnamese</option>
+          <option>Japanese</option>
+          <option>Korean</option>
+          <option>Spanish</option>
+          <option>French</option>
+        </select>
       </div>
 
       <div id="cv-editor" class="flex-1 overflow-auto px-5">
@@ -132,16 +142,8 @@
         <h3 class="text-xl font-semibold mb-2">Yourself</h3>
         <textarea id="yourself" placeholder="Describe Yourself" class="w-full p-3 border rounded mb-2 h-24"></textarea>
         <div class="flex flex-row gap-5">
-          <select id="language" class="select">
-            <option selected>English</option>
-            <option>Vietnamese</option>
-            <!-- <option>Japanese</option>
-            <option>Korean</option> -->
-            <option>Spanish</option>
-            <option>French</option>
-          </select>
           <div class="relative">
-            <div id="AiLoader" class="loader hidden absolute inset-0 z-50 backdrop-blur-sm bg-black/10 items-center justify-center">
+            <div id="AiLoader" class="loader hidden absolute inset-0 z-50 bg-blue-50 items-center justify-center">
               <span class="loading loading-spinner loading-lg text-blue-500"></span>
             </div>
             <button class="btn bg-blue-50 text-blue-500" onclick="generateAI()">AI Generation</button>
@@ -180,6 +182,10 @@
   <script src="./script/EBGaramond-Bold-normal.js"></script>
   <script src="./script/EBGaramond-Regular-normal.js"></script>
   <script src="./script/main.js"></script>
+  <script src="./script/NotoSansJP-Bold-normal.js"></script>
+  <script src="./script/NotoSansJP-Regular-normal.js"></script>
+  <script src="./script/NotoSansKR-Bold-normal.js"></script>
+  <script src="./script/NotoSansKR-Regular-normal.js"></script>
 </body>
 
 </html>
