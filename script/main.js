@@ -734,6 +734,13 @@ function loadHtml(obj) {
   document.getElementById('website').value = obj.website;
   document.getElementById('summary').value = obj.summary;
 
+  // Delete all existing skill entries
+  const skillEntries = document.querySelectorAll('.skills-entry');
+  skillEntries.forEach((entry, index) => {
+    if (index != 0)
+      entry.remove();
+  });
+
   const skills = obj.skills
   skills.map((skill, index) => {
     if (index == 0) {
@@ -754,6 +761,13 @@ function loadHtml(obj) {
       document.getElementById('skills-fields').appendChild(newEntry);
     }
   })
+
+  // Delete all existing experience entries
+  const experienceEntries = document.querySelectorAll('.experience-entry');
+  experienceEntries.forEach((entry, index) => {
+    if (index != 0)
+      entry.remove();
+  });
 
   const exps = obj.experiences
   exps.map((exp, index) => {
@@ -782,6 +796,13 @@ function loadHtml(obj) {
     }
   })
 
+  // Delete all existing project entries
+  const projectEntries = document.querySelectorAll('.project-entry');
+  projectEntries.forEach((entry, index) => {
+    if (index != 0)
+      entry.remove();
+  });
+
   const projs = obj.projects
   projs.map((proj, index) => {
     if (index == 0) {
@@ -804,6 +825,13 @@ function loadHtml(obj) {
       document.getElementById('project-fields').appendChild(newEntry);
     }
   })
+
+  // Delete all existing education entries
+  const educationEntries = document.querySelectorAll('.education-entry');
+  educationEntries.forEach((entry, index) => {
+    if (index != 0)
+      entry.remove();
+  });
 
   const edus = obj.educations
   edus.map((edu, index) => {
